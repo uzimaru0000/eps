@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	pipeline "github.com/mattn/go-pipeline"
@@ -23,7 +24,31 @@ func main() {
 }
 
 func action(context *cli.Context) error {
-	packages := packages.FetchPackageDatas()
+	var datas []byte
+	var err error
+	path := fmt.Sprintf("%s/0.19.0/search.json", os.Getenv("ELM_HOME"))
+	log.Printf(path)
+
+	if packages.PackagesFileExist(path) {
+		datas, err = packages.ReadPackagesFile(path)
+		if err != nil {
+			return err
+		}
+	} else {
+		datas, err = packages.FetchPackagesFile()
+		if err != nil {
+			return err
+		}
+		if err = packages.SavePackagesFile(path, datas); err != nil {
+			return err
+		}
+	}
+
+	packages, err := packages.ConverteJSON(datas)
+	if err != nil {
+		return err
+	}
+
 	idx, err := fuzzy.FindMulti(
 		packages,
 		func(i int) string {
@@ -34,9 +59,9 @@ func action(context *cli.Context) error {
 				return ""
 			}
 			return fmt.Sprintf(
-				"License: %s\nSummary: %s",
-				packages[i].License,
+				"- Summary -\n%s\n\nLicense: %s",
 				packages[i].Summary,
+				packages[i].License,
 			)
 		}))
 
