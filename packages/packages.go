@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 )
 
 type Package struct {
@@ -85,4 +86,9 @@ func ConverteJSON(jsonData []byte) ([]*Package, error) {
 
 	err := json.Unmarshal(jsonData, &packages)
 	return packages, err
+}
+
+func CacheCheck(updateDate time.Time, date time.Time) bool {
+	oneWeekSecond := time.Hour * 24 * 7
+	return date.Sub(updateDate) >= oneWeekSecond
 }

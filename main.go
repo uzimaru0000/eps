@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
+	"time"
 
 	pipeline "github.com/mattn/go-pipeline"
 	"github.com/uzimaru0000/eps/packages"
@@ -27,9 +27,9 @@ func action(context *cli.Context) error {
 	var datas []byte
 	var err error
 	path := fmt.Sprintf("%s/0.19.0/search.json", os.Getenv("ELM_HOME"))
-	log.Printf(path)
+	fileInfo, err := os.Stat(path)
 
-	if packages.PackagesFileExist(path) {
+	if err == nil && !packages.CacheCheck(fileInfo.ModTime(), time.Now()) {
 		datas, err = packages.ReadPackagesFile(path)
 		if err != nil {
 			return err
