@@ -89,6 +89,6 @@ func ConverteJSON(jsonData []byte) ([]*Package, error) {
 }
 
 func CacheCheck(updateDate time.Time, date time.Time) bool {
-	oneWeekSecond := time.Hour * 24 * 7
+	oneMonthSecond := time.Hour * 24 * 31
 	return date.Sub(updateDate) >= oneWeekSecond
 }
